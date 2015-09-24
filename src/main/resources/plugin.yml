@@ -1,0 +1,9 @@
+name: BedRockBreak
+author: kazu0617
+version: 0.2
+main: net.kazu0617.bedrockbreak.Main
+
+commands:
+  bedrockbreak:
+    description: use BedRockBreak Command
+    aliases: [brb]
