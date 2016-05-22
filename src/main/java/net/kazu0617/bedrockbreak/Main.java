@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -38,9 +39,10 @@ public class Main extends JavaPlugin implements Listener
     boolean DebugMode = false;
     
     @Override
-    public void onEnable()
-    {
-        getServer().getPluginManager().registerEvents(this, this);
+    public void onEnable(){
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(this, this);
+        pm.registerEvents(this.BreakListener, this);
         cLog.info("DebugMode is now ["+DebugMode+"].");
     }
     @Override
@@ -49,55 +51,35 @@ public class Main extends JavaPlugin implements Listener
         
     }
     @EventHandler
-    public void PlayerInspectMenu(PlayerInteractEvent e)
-    {
+    public void PlayerInspectMenu(PlayerInteractEvent e){
         Player p = e.getPlayer();
         Material Hand_m = p.getItemInHand().getType();
-        Material[][] Tools = new Material[5][4];
-        Tools[0][0] = Material.WOOD_AXE;
-        Tools[0][1] = Material.WOOD_PICKAXE;
-        Tools[0][2] = Material.WOOD_SPADE;
-        Tools[0][3] = Material.WOOD_SWORD;
-        Tools[1][0] = Material.STONE_AXE;
-        Tools[1][1] = Material.STONE_PICKAXE;
-        Tools[1][2] = Material.STONE_SPADE;
-        Tools[1][3] = Material.STONE_SWORD;
-        Tools[2][0] = Material.IRON_AXE;
-        Tools[2][1] = Material.IRON_PICKAXE;
-        Tools[2][2] = Material.IRON_SPADE;
-        Tools[2][3] = Material.IRON_SWORD;
-        Tools[3][0] = Material.GOLD_AXE;
-        Tools[3][1] = Material.GOLD_PICKAXE;
-        Tools[3][2] = Material.GOLD_SPADE;
-        Tools[3][3] = Material.GOLD_SWORD;
-        Tools[4][0] = Material.DIAMOND_AXE;
-        Tools[4][1] = Material.DIAMOND_PICKAXE;
-        Tools[4][2] = Material.DIAMOND_SPADE;
-        Tools[4][3] = Material.DIAMOND_SWORD;
+        Material[] Tools = {Material.STONE_PICKAXE,Material.IRON_PICKAXE,Material.GOLD_PICKAXE,Material.DIAMOND_PICKAXE};
         Action action = e.getAction();
         boolean containflag = false;
         Block loc_b = e.getClickedBlock();
         Location loc = loc_b.getLocation();
-        for(int i = 1; i <= 4; i++)
+        for(int i = 0; i < Tools.length; i++)
         {
-            for(int i2 = 1; i2 <= 2; i2++)
-            {
-                 if(Hand_m == Tools[i][i2])
-                {
-                    containflag = true;
-                    break;
-                }
-            }
-            if(containflag == true)
+            if(Hand_m == Tools[i]){
+                containflag = true;
                 break;
+            }
         }
         if (!containflag)
-        {
-            if (DebugMode) cLog.debug("containflag is " + containflag + ",so return.");
             return;
+        if(p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
+            if(loc.getBlockY()<=0){
+                cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
+                return;
+            }
+            if(loc_b.getType() == Material.BEDROCK){
+                loc_b.setType(Material.OBSIDIAN);
+                p.playSound(loc, Sound.DIG_STONE, 1, 10);
+                return;
+            }
         }
-        if(!p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK)
-        {
+        else if(!p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
             if(DebugMode){
                 cLog.info("loc_b.getType="+loc_b.getType());
                 cLog.info("loc_b.X ="+ loc_b.getX());
@@ -120,17 +102,6 @@ public class Main extends JavaPlugin implements Listener
             loc_b.setType(Material.STONE);
             p.playSound(p.getLocation(), Sound.CLICK, 1, 10);
             return;
-        }
-        else if(p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
-            if(loc.getBlockY()<=0){
-                cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
-                return;
-            }
-            if(loc_b.getType() == Material.BEDROCK){
-                loc_b.setType(Material.OBSIDIAN);
-                p.playSound(loc, Sound.DIG_STONE, 1, 10);
-                return;
-            }
         }
         else
         {

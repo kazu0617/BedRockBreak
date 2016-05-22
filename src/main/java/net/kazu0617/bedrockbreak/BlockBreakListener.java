@@ -45,8 +45,9 @@ class BlockBreakListener implements Listener{
      @EventHandler
      public void onBlockBreak(BlockBreakEvent e) {
          Player p = e.getPlayer();
+         Material B = e.getBlock().getType();
          Location L = e.getBlock().getLocation();
-         if(!p.hasPermission("bedrockbreak.advance") && L.getBlockY()<=5){
+         if(p.hasPermission("bedrockbreak.advance") && B == Material.OBSIDIAN &&L.getBlockY()<=5){
              e.getPlayer().getWorld().dropItem(L, new ItemStack(Material.BEDROCK, 1));
              plugin.cLog.Message(p, "Obsidianも落ちるけどソレはまあ、おまけということで");
          }
