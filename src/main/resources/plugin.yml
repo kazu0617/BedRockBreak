@@ -1,9 +1,20 @@
 name: BedRockBreak
 author: kazu0617
-version: 0.2
+version: 0.3
 main: net.kazu0617.bedrockbreak.Main
 
 commands:
   bedrockbreak:
     description: use BedRockBreak Command
     aliases: [brb]
+    
+permissions:
+  bedrockbreak.use:
+    description: to Use Normal Mode
+    default: true
+  bedrockbreak.advance:
+    description: to Use Avdance Mode
+    default: false
+  bedrockbreak.auto:
+    description: to Use Auto Mode
+    default: false

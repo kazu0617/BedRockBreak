@@ -5,6 +5,7 @@
  */
 package net.kazu0617.bedrockbreak;
 
+import java.io.File;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,8 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /**
  * @version 0.1
@@ -28,19 +27,21 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class Main extends JavaPlugin implements Listener
 {
+    //Todo 黒曜石ブロックに置き換え(これに関しては権限がない方は今までどおり通常の石に変更でいいかと)→高度4以下に位置する黒曜石ブロックを壊したタイミングに指定の権限がある方のみドロップを岩盤ブロックに変更する
+    //Todo 高度5以上にある岩盤ブロックに関しては、指定の権限がある方のみ黒曜石ブロックにかえれるようにする
     String Pluginprefix = "[" + ChatColor.GREEN + getDescription().getName() + ChatColor.RESET + "] ";
     String Pluginname = "[" + getDescription().getName() +"] ";
     public ConsoleLog cLog = new ConsoleLog(this);
+    public BlockBreakListener BreakListener = new BlockBreakListener(this);
+    String folder = getDataFolder() + File.separator;
  
     boolean DebugMode = false;
-    boolean PreMode = false;
     
     @Override
     public void onEnable()
     {
         getServer().getPluginManager().registerEvents(this, this);
         cLog.info("DebugMode is now ["+DebugMode+"].");
-        cLog.info("PreMode is now ["+PreMode+"].");
     }
     @Override
     public void onDisable()
@@ -75,6 +76,8 @@ public class Main extends JavaPlugin implements Listener
         Tools[4][3] = Material.DIAMOND_SWORD;
         Action action = e.getAction();
         boolean containflag = false;
+        Block loc_b = e.getClickedBlock();
+        Location loc = loc_b.getLocation();
         for(int i = 1; i <= 4; i++)
         {
             for(int i2 = 1; i2 <= 2; i2++)
@@ -93,46 +96,39 @@ public class Main extends JavaPlugin implements Listener
             if (DebugMode) cLog.debug("containflag is " + containflag + ",so return.");
             return;
         }
-        if(action == Action.LEFT_CLICK_BLOCK )
+        if(!p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK)
         {
-            Block loc_b = e.getClickedBlock();
-            if(DebugMode)
-            {
+            if(DebugMode){
                 cLog.info("loc_b.getType="+loc_b.getType());
                 cLog.info("loc_b.X ="+ loc_b.getX());
                 cLog.info("loc_b.Y ="+ loc_b.getY());
                 cLog.info("loc_b.Z ="+ loc_b.getZ());
             }
-            Location loc = loc_b.getLocation();
-            if(loc.getBlockY()<=0)
-            {
+            if(loc.getBlockY()<=0){
                 cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
-                    return;
-            }
-            Block loc2b = loc.getBlock();
-            if(DebugMode)
-            {
-                cLog.info("loc2b.getType="+loc2b.getType());
-                cLog.info("loc2b.X ="+ loc2b.getX());
-                cLog.info("loc2b.Y ="+ loc2b.getY());
-                cLog.info("loc2b.Z ="+ loc2b.getZ());
-
-            }
-            if(loc2b.getType()!=Material.BEDROCK)
-            {
-                if(DebugMode)
-                    cLog.debug("loc2b= "+loc2b.getType()+", return.");
                 return;
             }
-            if(PreMode)
-            {
-               p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 1, Integer.MAX_VALUE));
-               return;
+            if(loc.getBlockY()>5){
+                cLog.Message(p, "いやソレどう考えても手動で置いてるでしょ(ヽ´ω`)");
+                return;
             }
-            else if(!PreMode)
-            {
-                loc_b.setType(Material.STONE);
-                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+            if(loc_b.getType()!=Material.BEDROCK){
+                if(DebugMode)
+                    cLog.debug("loc_b= "+loc_b.getType()+", return.");
+                return;
+            }
+            loc_b.setType(Material.STONE);
+            p.playSound(p.getLocation(), Sound.CLICK, 1, 10);
+            return;
+        }
+        else if(p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
+            if(loc.getBlockY()<=0){
+                cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
+                return;
+            }
+            if(loc_b.getType() == Material.BEDROCK){
+                loc_b.setType(Material.OBSIDIAN);
+                p.playSound(loc, Sound.DIG_STONE, 1, 10);
                 return;
             }
         }
@@ -152,12 +148,6 @@ public class Main extends JavaPlugin implements Listener
             if(DebugMode) DebugMode = false;
             else if(!DebugMode) DebugMode = true;
             cLog.Message(sender,"DebugMode is now ["+DebugMode+"].");
-        }
-        else if((args.length == 1) && "PreMode".equalsIgnoreCase(args[0]))
-        {
-            if(PreMode) PreMode = false;
-            else if(!DebugMode) PreMode = true;
-            cLog.Message(sender,"PreMode is now ["+PreMode+"].");
         }
         
         return true;
