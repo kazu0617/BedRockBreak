@@ -53,21 +53,22 @@ public class Main extends JavaPlugin implements Listener
     @EventHandler
     public void PlayerInspectMenu(PlayerInteractEvent e){
         Player p = e.getPlayer();
+        if(p.getInventory().getItemInHand()==null) return;
         Material Hand_m = p.getItemInHand().getType();
         Material[] Tools = {Material.STONE_PICKAXE,Material.IRON_PICKAXE,Material.GOLD_PICKAXE,Material.DIAMOND_PICKAXE};
-        Action action = e.getAction();
         boolean containflag = false;
-        Block loc_b = e.getClickedBlock();
-        Location loc = loc_b.getLocation();
-        for(int i = 0; i < Tools.length; i++)
-        {
-            if(Hand_m == Tools[i]){
+        for (Material Tool : Tools) {
+            if (Hand_m == Tool) {
                 containflag = true;
                 break;
             }
         }
         if (!containflag)
             return;
+        
+        Action action = e.getAction();
+        Block loc_b = e.getClickedBlock();
+        Location loc = loc_b.getLocation();
         if(p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
             if(loc.getBlockY()<=0){
                 cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
@@ -90,15 +91,13 @@ public class Main extends JavaPlugin implements Listener
                 cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
                 return;
             }
-            if(loc.getBlockY()>5){
-                cLog.Message(p, "いやソレどう考えても手動で置いてるでしょ(ヽ´ω`)");
-                return;
-            }
             if(loc_b.getType()!=Material.BEDROCK){
                 if(DebugMode)
                     cLog.debug("loc_b= "+loc_b.getType()+", return.");
                 return;
             }
+            if(loc.getBlockY()>5)
+                return;
             loc_b.setType(Material.STONE);
             p.playSound(p.getLocation(), Sound.CLICK, 1, 10);
             return;

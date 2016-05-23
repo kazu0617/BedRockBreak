@@ -1,6 +1,6 @@
 name: BedRockBreak
 author: kazu0617
-version: 0.3.1
+version: 0.3.3
 main: net.kazu0617.bedrockbreak.Main
 
 commands:
