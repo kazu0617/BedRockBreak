@@ -51,12 +51,23 @@ public class Main extends JavaPlugin implements Listener
         
     }
     @EventHandler
-    public void PlayerInspectMenu(PlayerInteractEvent e){
+    public void onPlayerInspect(PlayerInteractEvent e){
         Player p = e.getPlayer();
         if(p.getInventory().getItemInHand()==null) return;
         Material Hand_m = p.getItemInHand().getType();
         Material[] Tools = {Material.STONE_PICKAXE,Material.IRON_PICKAXE,Material.GOLD_PICKAXE,Material.DIAMOND_PICKAXE};
+        Block loc_b = e.getClickedBlock();
+        Location loc = loc_b.getLocation();
         boolean containflag = false;
+        if (DebugMode) {
+            cLog.info("loc_b.getType=" + loc_b.getType());
+            cLog.info("loc_b.X =" + loc_b.getX());
+            cLog.info("loc_b.Y =" + loc_b.getY());
+            cLog.info("loc_b.Z =" + loc_b.getZ());
+        }
+
+        if ( e.getAction() != Action.LEFT_CLICK_BLOCK || loc_b.getType() != Material.BEDROCK || loc.getBlockY()<=0)
+            return;
         for (Material Tool : Tools) {
             if (Hand_m == Tool) {
                 containflag = true;
@@ -65,41 +76,18 @@ public class Main extends JavaPlugin implements Listener
         }
         if (!containflag)
             return;
-        
-        Action action = e.getAction();
-        Block loc_b = e.getClickedBlock();
-        Location loc = loc_b.getLocation();
-        if(p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
-            if(loc.getBlockY()<=0){
-                cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
-                return;
-            }
-            if(loc_b.getType() == Material.BEDROCK){
-                loc_b.setType(Material.OBSIDIAN);
-                p.playSound(loc, Sound.DIG_STONE, 1, 10);
-                return;
-            }
+
+        if(p.hasPermission("bedrockbreak.advance")){
+
+            loc_b.setType(Material.OBSIDIAN);
+            p.playSound(loc, Sound.DIG_STONE, 1, 10);
+            return;
         }
-        else if(!p.hasPermission("bedrockbreak.advance") && action == Action.LEFT_CLICK_BLOCK){
-            if(DebugMode){
-                cLog.info("loc_b.getType="+loc_b.getType());
-                cLog.info("loc_b.X ="+ loc_b.getX());
-                cLog.info("loc_b.Y ="+ loc_b.getY());
-                cLog.info("loc_b.Z ="+ loc_b.getZ());
-            }
-            if(loc.getBlockY()<=0){
-                cLog.Message(p, ChatColor.DARK_RED+"高度0の岩盤は壊せません");
-                return;
-            }
-            if(loc_b.getType()!=Material.BEDROCK){
-                if(DebugMode)
-                    cLog.debug("loc_b= "+loc_b.getType()+", return.");
-                return;
-            }
+        else if(!p.hasPermission("bedrockbreak.advance")){
             if(loc.getBlockY()>5)
                 return;
             loc_b.setType(Material.STONE);
-            p.playSound(p.getLocation(), Sound.CLICK, 1, 10);
+            p.playSound(p.getLocation(), Sound.DIG_STONE, 1, 10);
             return;
         }
         else
@@ -108,7 +96,6 @@ public class Main extends JavaPlugin implements Listener
                 cLog.debug("return");
             return;
         }
-
     }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
