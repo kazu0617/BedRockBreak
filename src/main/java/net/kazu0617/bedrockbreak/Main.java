@@ -28,8 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin implements Listener
 {
-    //Todo 黒曜石ブロックに置き換え(これに関しては権限がない方は今までどおり通常の石に変更でいいかと)→高度4以下に位置する黒曜石ブロックを壊したタイミングに指定の権限がある方のみドロップを岩盤ブロックに変更する
-    //Todo 高度5以上にある岩盤ブロックに関しては、指定の権限がある方のみ黒曜石ブロックにかえれるようにする
+    //Todo Auto機能を実装。
     String Pluginprefix = "[" + ChatColor.GREEN + getDescription().getName() + ChatColor.RESET + "] ";
     String Pluginname = "[" + getDescription().getName() +"] ";
     public ConsoleLog cLog = new ConsoleLog(this);
@@ -57,7 +56,7 @@ public class Main extends JavaPlugin implements Listener
         Material Hand_m = p.getItemInHand().getType();
         Material[] Tools = {Material.STONE_PICKAXE,Material.IRON_PICKAXE,Material.GOLD_PICKAXE,Material.DIAMOND_PICKAXE};
         Block loc_b = e.getClickedBlock();
-        Location loc = loc_b.getLocation();
+        Location loc;
         boolean containflag = false;
         if (DebugMode) {
             cLog.info("loc_b.getType=" + loc_b.getType());
@@ -66,7 +65,7 @@ public class Main extends JavaPlugin implements Listener
             cLog.info("loc_b.Z =" + loc_b.getZ());
         }
 
-        if ( e.getAction() != Action.LEFT_CLICK_BLOCK || loc_b.getType() != Material.BEDROCK || loc.getBlockY()<=0)
+        if ( e.getAction() != Action.LEFT_CLICK_BLOCK || loc_b.getType() != Material.BEDROCK || loc_b.getY()<=0)
             return;
         for (Material Tool : Tools) {
             if (Hand_m == Tool) {
@@ -77,8 +76,8 @@ public class Main extends JavaPlugin implements Listener
         if (!containflag)
             return;
 
+        loc = loc_b.getLocation();//何故か先頭で宣言するとエラー吐くので
         if(p.hasPermission("bedrockbreak.advance")){
-
             loc_b.setType(Material.OBSIDIAN);
             p.playSound(loc, Sound.DIG_STONE, 1, 10);
             return;

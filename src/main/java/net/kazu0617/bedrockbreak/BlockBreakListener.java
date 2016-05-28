@@ -25,6 +25,7 @@ package net.kazu0617.bedrockbreak;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,11 +46,29 @@ class BlockBreakListener implements Listener{
      @EventHandler
      public void onBlockBreak(BlockBreakEvent e) {
          Player p = e.getPlayer();
-         Material B = e.getBlock().getType();
+         Material B_M = e.getBlock().getType();
          Location L = e.getBlock().getLocation();
-         if(p.hasPermission("bedrockbreak.advance") && B == Material.OBSIDIAN &&L.getBlockY()<=5){
+         if(p.hasPermission("bedrockbreak.advance") && B_M == Material.OBSIDIAN &&e.getBlock().getY()<=5){
              e.getPlayer().getWorld().dropItem(L, new ItemStack(Material.BEDROCK, 1));
              plugin.cLog.Message(p, "Obsidianも落ちるけどソレはまあ、おまけということで");
+         }
+         else if(p.hasPermission("bedrockbreak.auto"))
+         {
+             Location CL = L;
+             for(int x = -50 ; x <=50 ; x++ )
+             {
+                 L.setX(CL.getY()+x);
+                 for(int z = -50 ; x <=50 ; z++ )
+                 {
+                     L.setZ(CL.getY()+z);
+                     for(int y = 1 ; y<= 5 ; y++ )
+                     {
+                         L.setY(y);
+                         if(L.getBlock().getType()==Material.BEDROCK)
+                             L.getBlock().setType(Material.STONE);
+                     }
+                 }
+             }
          }
      }
 }
