@@ -1,26 +1,4 @@
-/*
- * The MIT License
- *
- * Copyright 2016 kazu0617<kazuyagi19990617@hotmail.co.jp>.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 package net.kazu0617.bedrockbreak;
 
 import org.bukkit.Location;
@@ -33,8 +11,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- *
- * @author kazu0617<kazuyagi19990617@hotmail.co.jp>
+ * @author     kazu0617
+ * @license    MIT
+ * @copyright  Copyright kazu0617 2015-2016
  */
 class BlockBreakListener implements Listener{
      Main plugin;
@@ -46,26 +25,20 @@ class BlockBreakListener implements Listener{
      @EventHandler
      public void onBlockBreak(BlockBreakEvent e) {
          Player p = e.getPlayer();
-         Material B_M = e.getBlock().getType();
-         Location L = e.getBlock().getLocation();
-         if(p.hasPermission("bedrockbreak.advance") && B_M == Material.OBSIDIAN &&e.getBlock().getY()<=5){
-             e.getPlayer().getWorld().dropItem(L, new ItemStack(Material.BEDROCK, 1));
-             plugin.cLog.Message(p, "Obsidianも落ちるけどソレはまあ、おまけということで");
+         Block Block = e.getBlock();
+         if(p.hasPermission("bedrockbreak.advance") && Block.getType() == Material.OBSIDIAN && e.getBlock().getY()<=5){
+             e.getPlayer().getWorld().dropItem(Block.getLocation(), new ItemStack(Material.BEDROCK, 1));
          }
-         else if(p.hasPermission("bedrockbreak.auto"))
-         {
-             Location CL = L;
-             for(int x = -50 ; x <=50 ; x++ )
-             {
-                 L.setX(CL.getY()+x);
-                 for(int z = -50 ; x <=50 ; z++ )
-                 {
-                     L.setZ(CL.getY()+z);
-                     for(int y = 1 ; y<= 5 ; y++ )
-                     {
-                         L.setY(y);
-                         if(L.getBlock().getType()==Material.BEDROCK)
-                             L.getBlock().setType(Material.STONE);
+         else if(p.hasPermission("bedrockbreak.auto")) {
+             Location CL = Block.getLocation();
+             for(int x = -50 ; x <=50 ; x++ ) {
+                 CL.setX(Block.getLocation().getY()+x);
+                 for(int z = -50 ; x <=50 ; z++ ) {
+                     CL.setZ(Block.getLocation().getY()+z);
+                     for(int y = 1 ; y<= 5 ; y++ ) {
+                        CL.setY(y);
+                         if(Block.getLocation().getBlock().getType()==Material.BEDROCK)
+                             Block.getLocation().getBlock().setType(Material.STONE);
                      }
                  }
              }

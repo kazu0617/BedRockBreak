@@ -1,12 +1,9 @@
-/**
- * @author     kazu0617
- * @license    LGPLv3
- * @copyright  Copyright kazu0617 2015
- */
 package net.kazu0617.bedrockbreak;
 
 import java.io.File;
+import java.util.HashSet;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,9 +19,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * @version 0.1
- * @author kazu0617
- * @copyright Copyright kazu0617 2015
+ * @author     kazu0617
+ * @license    MIT
+ * @copyright  Copyright kazu0617 2015-2016
  */
 public class Main extends JavaPlugin implements Listener
 {
@@ -50,50 +47,33 @@ public class Main extends JavaPlugin implements Listener
         
     }
     @EventHandler
-    public void onPlayerInspect(PlayerInteractEvent e){
+    public void onPlayerInspect(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if(p.getInventory().getItemInHand()==null) return;
-        Material Hand_m = p.getItemInHand().getType();
-        Material[] Tools = {Material.STONE_PICKAXE,Material.IRON_PICKAXE,Material.GOLD_PICKAXE,Material.DIAMOND_PICKAXE};
+        if(p.getInventory().getItemInMainHand()==null) return;
+        HashSet <Material> Tools = new HashSet<>();
         Block loc_b = e.getClickedBlock();
-        Location loc;
-        boolean containflag = false;
-        if (DebugMode) {
-            cLog.info("loc_b.getType=" + loc_b.getType());
-            cLog.info("loc_b.X =" + loc_b.getX());
-            cLog.info("loc_b.Y =" + loc_b.getY());
-            cLog.info("loc_b.Z =" + loc_b.getZ());
-        }
-
-        if ( e.getAction() != Action.LEFT_CLICK_BLOCK || loc_b.getType() != Material.BEDROCK || loc_b.getY()<=0)
-            return;
-        for (Material Tool : Tools) {
-            if (Hand_m == Tool) {
-                containflag = true;
-                break;
-            }
-        }
-        if (!containflag)
+        
+        Tools.add(Material.STONE_PICKAXE);
+        Tools.add(Material.IRON_PICKAXE);
+        Tools.add(Material.GOLD_PICKAXE);
+        Tools.add(Material.DIAMOND_PICKAXE);
+        
+        if ( p.getGameMode()!=GameMode.SURVIVAL 
+                || e.getAction() != Action.LEFT_CLICK_BLOCK 
+                || loc_b.getType() != Material.BEDROCK 
+                || loc_b.getY()<=0
+                || Tools.contains(p.getInventory().getItemInMainHand().getType()))
             return;
 
-        loc = loc_b.getLocation();//何故か先頭で宣言するとエラー吐くので
         if(p.hasPermission("bedrockbreak.advance")){
             loc_b.setType(Material.OBSIDIAN);
-            p.playSound(loc, Sound.DIG_STONE, 1, 10);
-            return;
+            p.playSound(loc_b.getLocation(), Sound.BLOCK_METAL_BREAK, 1, 10);
         }
         else if(!p.hasPermission("bedrockbreak.advance")){
-            if(loc.getBlockY()>5)
+            if(loc_b.getLocation().getBlockY()>5)
                 return;
             loc_b.setType(Material.STONE);
-            p.playSound(p.getLocation(), Sound.DIG_STONE, 1, 10);
-            return;
-        }
-        else
-        {
-            if(DebugMode)
-                cLog.debug("return");
-            return;
+            p.playSound(p.getLocation(), Sound.BLOCK_METAL_BREAK, 1, 10);
         }
     }
     @Override
