@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashSet;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -21,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * @author     kazu0617
  * @license    MIT
- * @copyright  Copyright kazu0617 2015-2016
+ * @copyright  Copyright kazu0617 2015-2017
  */
 public class Main extends JavaPlugin implements Listener
 {
@@ -35,23 +34,24 @@ public class Main extends JavaPlugin implements Listener
     boolean DebugMode = false;
     
     @Override
-    public void onEnable(){
+    public void onEnable() {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
         pm.registerEvents(this.BreakListener, this);
-        cLog.info("DebugMode is now ["+DebugMode+"].");
+        cLog.info("DebugMode is now [" + DebugMode + "].");
     }
+
     @Override
-    public void onDisable()
-    {
-        
+    public void onDisable() {
+
     }
+
     @EventHandler
     public void onPlayerInspect(PlayerInteractEvent e) {
         Player p = e.getPlayer();
         if(p.getInventory().getItemInMainHand()==null) return;
         HashSet <Material> Tools = new HashSet<>();
-        Block loc_b = e.getClickedBlock();
+        Block Location = e.getClickedBlock();
         
         Tools.add(Material.STONE_PICKAXE);
         Tools.add(Material.IRON_PICKAXE);
@@ -60,20 +60,20 @@ public class Main extends JavaPlugin implements Listener
         
         if ( p.getGameMode()!=GameMode.SURVIVAL 
                 || e.getAction() != Action.LEFT_CLICK_BLOCK 
-                || loc_b.getType() != Material.BEDROCK 
-                || loc_b.getY()<=0
-                || Tools.contains(p.getInventory().getItemInMainHand().getType()))
+                || Location.getType() != Material.BEDROCK 
+                || Location.getY()<=0
+                || !Tools.contains(p.getInventory().getItemInMainHand().getType()))
             return;
 
         if(p.hasPermission("bedrockbreak.advance")){
-            loc_b.setType(Material.OBSIDIAN);
-            p.playSound(loc_b.getLocation(), Sound.BLOCK_METAL_BREAK, 1, 10);
+            Location.setType(Material.OBSIDIAN);
+            p.playSound(Location.getLocation(), Sound.BLOCK_LEVER_CLICK, 0, 10);
         }
         else if(!p.hasPermission("bedrockbreak.advance")){
-            if(loc_b.getLocation().getBlockY()>5)
+            if(Location.getLocation().getBlockY()>5)
                 return;
-            loc_b.setType(Material.STONE);
-            p.playSound(p.getLocation(), Sound.BLOCK_METAL_BREAK, 1, 10);
+            Location.setType(Material.STONE);
+            p.playSound(Location.getLocation(), Sound.BLOCK_LEVER_CLICK, 0, 10);
         }
     }
     @Override
