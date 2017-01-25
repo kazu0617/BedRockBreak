@@ -19,7 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * @author     kazu0617
- * @license    MIT
+ * @license    Mozilla Public License Version 2.0
  * @copyright  Copyright kazu0617 2015-2017
  */
 public class Main extends JavaPlugin implements Listener

@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 
 /**
  * @author     kazu0617
- * @license    MIT
- * @copyright  Copyright kazu0617 2015-2016
+ * @license    Mozilla Public License Version 2.0
+ * @copyright  Copyright kazu0617 2015-2017
  */
 public class ConsoleLog
 {

@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * @author     kazu0617
- * @license    MIT
+ * @license    Mozilla Public License Version 2.0
  * @copyright  Copyright kazu0617 2015-2017
  */
 class BlockBreakListener implements Listener{
